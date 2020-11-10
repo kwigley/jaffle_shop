@@ -1,16 +1,16 @@
 version: 2
 
-sources:
-  - name: asdf
-    database: dbt
-    schema: public
-    loaded_at_field: created_at
-    tables:
-      - name: database_account
+# sources:
+#   - name: asdf
+#     database: dbt
+#     schema: public
+#     loaded_at_field: created_at
+#     tables:
+#       - name: database_account
 
-    freshness:
-      warn_after: {count: 12, period: hour}
-      error_after: {count: 24, period: hour}
+#     freshness:
+#       warn_after: { count: 12, period: hour }
+#       error_after: { count: 24, period: hour }
 
 models:
   - name: dim_customers
@@ -69,7 +69,8 @@ models:
         description: '{{ doc("orders_status") }}'
         tests:
           - accepted_values:
-              values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
+              values:
+                ["placed", "shipped", "completed", "return_pending", "returned"]
 
       - name: amount
         description: Total amount (AUD) of the order
@@ -95,3 +96,17 @@ models:
         description: Amount of the order (AUD) paid for by gift card
         tests:
           - not_null
+exposures:
+  - name: weekly_jaffle_metrics
+    type: dashboard
+    maturity: high
+    url: https://bi.tool/dashboards/1
+    description: '{{ doc("licence_status_stats_descr") }}'
+
+    depends_on:
+      - ref('fct_orders')
+      - ref('dim_customers')
+
+    owner:
+      name: Claire from Data
+      email: data@jaffleshop.com
